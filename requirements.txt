@@ -1,0 +1,14 @@
+streamlit      
+langchain
+openai
+pinecone-client
+PyPDF2
+python-dotenv
+tiktoken
+unstructured
+numpy
+pandas
+python-multipart
+sentence-transformers
+langchain-community
+langchain-openai
