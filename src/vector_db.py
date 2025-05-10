@@ -61,11 +61,11 @@ def create_or_get_index(pc: PineconeClient, index_name: Optional[str] = None) ->
     if not pc.has_index(index_name):
         pc.create_index(
             name=index_name,
-            dimension=1536,           # Ajusta según tu embedding
+            dimension=1536,  
             metric="cosine",
             spec=ServerlessSpec(
                 cloud="aws",
-                region="us-east-1"   # Región compatible con tu plan
+                region="PINECONE_REGION", 
             )
         )
         print(f"Índice '{index_name}' creado")
