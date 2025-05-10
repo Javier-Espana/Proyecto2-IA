@@ -17,7 +17,7 @@ pip install -r requirements.txt
 ```bash
 OPENAI_API_KEY=tu-clave-openai-aquí
 PINECONE_API_KEY=tu-clave-pinecone-aquí
-PINECONE_ENVIRONMENT=us-east-1
+PINECONE_REGION=us-east-1
 PINECONE_INDEX_NAME=db
 
 DOC_CHUNK_SIZE=1000
