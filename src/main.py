@@ -60,7 +60,6 @@ def display_answer(response: dict) -> None:
 def main():
     # Sidebar con información
     with st.sidebar:
-        st.image("assets/logo.png", width=200)
         st.markdown(f"### {AppConfig.UI_SETTINGS['page_title']}")
         st.markdown("Asistente de consultas técnicas con IA")
         st.markdown("---")

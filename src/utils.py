@@ -6,6 +6,8 @@ from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from dotenv import load_dotenv
 import tiktoken
+import unicodedata
+import re
 
 # Cargar variables de entorno
 load_dotenv()
@@ -118,5 +120,13 @@ def validate_query(query: str) -> bool:
     return True
 
 def clean_filename(filename: str) -> str:
-    """Limpia nombres de archivo para usarlos como IDs en Pinecone"""
-    return os.path.splitext(filename)[0].replace(" ", "_").lower()
+    """Normaliza un nombre de archivo a ASCII, sin espacios ni caracteres especiales."""
+    name, _ = os.path.splitext(filename)
+    # Descompone caracteres Unicode y quita acentos
+    nfkd = unicodedata.normalize("NFKD", name)
+    ascii_name = nfkd.encode("ASCII", "ignore").decode("ASCII")
+    # Reemplaza cualquier cosa que no sea letra, dígito o guion bajo por guion bajo
+    ascii_name = re.sub(r"[^\w\-]+", "_", ascii_name)
+    # Quita guiones bajos repetidos y acentos sobrantes
+    ascii_name = re.sub(r"_+", "_", ascii_name).strip("_").lower()
+    return ascii_name
