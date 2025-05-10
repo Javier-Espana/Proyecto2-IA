@@ -81,7 +81,6 @@ def load_documents_to_pinecone(file_paths: List[str], namespace: str = "technica
     embeddings = OpenAIEmbeddings()
     all_docs = []
     
-    # Preparamos el índice para la verificación de duplicados
     index = pc.Index(index_name)
     
     for file_path in file_paths:
@@ -94,16 +93,14 @@ def load_documents_to_pinecone(file_paths: List[str], namespace: str = "technica
         except Exception as e:
             print(f"Error procesando {file_path}: {str(e)}")
     
-    # Convertir documentos a vectores
     if all_docs:
         vectors = []
         for doc in all_docs:
             embedding = embeddings.embed_query(doc.page_content)
-            # Incluimos explícitamente el texto en la metadata:
             meta = {
                 "id": doc.metadata["id"],
                 "source": doc.metadata["source"],
-                "text": doc.page_content,           # <— aquí!
+                "text": doc.page_content,
             }
             vectors.append({
                 "id": doc.metadata["id"],
@@ -111,24 +108,16 @@ def load_documents_to_pinecone(file_paths: List[str], namespace: str = "technica
                 "metadata": meta
             })
         
-        # Consulta de IDs existentes
-        existing_ids = set()  # Usamos un set para optimizar la búsqueda
-        for vector in vectors:
-            try:
-                response = index.query(
-                    vector=vector["values"],
-                    top_k=1,
-                    namespace=namespace
-                )
-                if response["matches"]:
-                    existing_ids.add(vector["id"])  # El ID ya existe
-            except Exception as e:
-                print(f"Error al consultar el vector: {e}")
+        # Extraer los IDs a verificar
+        ids_to_check = [vec["id"] for vec in vectors]
         
-        # Filtra los vectores duplicados
+        # Verificar si los IDs ya existen en Pinecone
+        existing_vectors = index.fetch(ids=ids_to_check, namespace=namespace)
+        existing_ids = set(existing_vectors.vectors.keys())
+        
+        # Filtrar los vectores nuevos
         new_vectors = [vec for vec in vectors if vec["id"] not in existing_ids]
         
-        # Si hay nuevos vectores, realiza el upsert
         if new_vectors:
             index.upsert(vectors=new_vectors, namespace=namespace)
             print(f"{len(new_vectors)} nuevos documentos cargados en namespace '{namespace}'")
