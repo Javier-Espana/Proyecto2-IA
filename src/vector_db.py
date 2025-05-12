@@ -65,7 +65,7 @@ def create_or_get_index(pc: PineconeClient, index_name: Optional[str] = None) ->
             metric="cosine",
             spec=ServerlessSpec(
                 cloud="aws",
-                region="PINECONE_REGION", 
+                region=os.getenv("PINECONE_REGION"),
             )
         )
         print(f"Índice '{index_name}' creado")
